@@ -15,10 +15,10 @@ var coreGLSLExtensions = [
 
 var reservedWords = require('./lib/builtins')
 
-function transpile(isVertex, source) {
+function transpile(isVertex, source, newVersion = '150') {
   var tokens = tokenize(source)
-  var oldVersion = versionify(tokens)
-  if (oldVersion !== '150') {
+  var oldVersion = versionify(tokens, newVersion)
+  if (oldVersion !== newVersion) {
     var nameCache = {}
     var reservedNameCache = {}
     var fragColorName = null
@@ -47,8 +47,8 @@ function transpile(isVertex, source) {
         }
       } else if (token.type === 'ident' && reservedWords.indexOf(token.data) >= 0) {
         if (isVertex && isAttribtue(tokens, i)) {
-          throw new Error('Unable to transpile GLSL 100 to 150 automatically:\n' +
-              'One of the vertex shader attributes is using a reserved 150 keyword "' + token.data + '"')
+          throw new Error(`Unable to transpile GLSL 100 to ${newVersion} automatically: ` +
+              `One of the vertex shader attributes is using a reserved ${newVersion} keyword "${token.data}"`)
         }
         if (!(token.data in reservedNameCache)) {
           reservedNameCache[token.data] = getUniqueName(tokens, nameCache, token.data)
@@ -124,19 +124,19 @@ function insertFragOutput (tokens, name, dataType) {
   ])
 }
 
-function versionify(tokens) {
+function versionify(tokens, newVersion) {
   for (var i = 0; i < tokens.length; i++) {
     var token = tokens[i]
     if (token.type === 'preprocessor') {
       var match = version.exec(token.data)
       if (match) {
         var number = match[1].replace(/\s\s+/g, ' ')
-        if (number === '150') {
-          // this shader is already in 150
+        if (number === newVersion) {
+          // this shader is already in new version
           return number
         } else if (number === '100') {
           tokens.splice(i, 1, {
-            data: '#version 150',
+            data: `#version ${newVersion}`,
             type: 'preprocessor'
           })
           return number
@@ -149,7 +149,7 @@ function versionify(tokens) {
 
   // no version found, insert into start
   tokens.splice(0, 0, {
-    data: '#version 150',
+    data: `#version ${newVersion}`,
     type: 'preprocessor'
   }, {
     data: '\n',
