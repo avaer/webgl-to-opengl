@@ -5,6 +5,8 @@ var stringify = require('glsl-token-string')
 
 module.exports.vertex = transpile.bind(null, true)
 module.exports.fragment = transpile.bind(null, false)
+module.exports.mapName = mapName
+module.exports.unmapName = unmapName
 
 var coreGLSLExtensions = [
   'GL_OES_standard_derivatives',
@@ -19,8 +21,6 @@ function transpile(isVertex, source, newVersion = '150') {
   var tokens = tokenize(source)
   var oldVersion = versionify(tokens, newVersion)
   if (oldVersion !== newVersion) {
-    var nameCache = {}
-    var reservedNameCache = {}
     var fragColorName = null
     var fragDepthName = null
     var i, token
@@ -34,13 +34,13 @@ function transpile(isVertex, source, newVersion = '150') {
       } else if (token.type === 'builtin' && !isVertex) {
         if (token.data === 'gl_FragColor') {
           if (!fragColorName) {
-            fragColorName = getUniqueName(tokens, nameCache, 'fragColor')
+            fragColorName = mapName('fragColor')
             insertFragOutput(tokens, fragColorName, 'vec4')
           }
           token.data = fragColorName
         } else if (token.data === 'gl_FragDepth') {
           if (!fragDepthName) {
-            fragDepthName = getUniqueName(tokens, nameCache, 'fragDepth')
+            fragDepthName = mapName('fragDepth')
             insertFragOutput(tokens, fragDepthName, 'float')
           }
           token.data = fragDepthName
@@ -50,10 +50,7 @@ function transpile(isVertex, source, newVersion = '150') {
           throw new Error(`Unable to transpile GLSL 100 to ${newVersion} automatically: ` +
               `One of the vertex shader attributes is using a reserved ${newVersion} keyword "${token.data}"`)
         }
-        if (!(token.data in reservedNameCache)) {
-          reservedNameCache[token.data] = getUniqueName(tokens, nameCache, token.data)
-        }
-        token.data = reservedNameCache[token.data]
+        token.data = mapName(token.data)
       }
     }
 
@@ -91,24 +88,6 @@ function isAttribtue (tokens, index) {
     }
   }
   return false
-}
-
-function getUniqueName (tokens, nameCache, name, baseName) {
-  baseName = baseName || name // first time around
-
-  for (var i = 0; i < tokens.length; i++) {
-    var t = tokens[i]
-    if (t.type === 'ident' && t.data === name) {
-      if (baseName in nameCache) {
-        nameCache[baseName]++
-      } else {
-        nameCache[baseName] = 0
-      }
-      var num = nameCache[baseName]
-      return getUniqueName(tokens, nameCache, baseName + '_' + num, baseName)
-    }
-  }
-  return name
 }
 
 function insertFragOutput (tokens, name, dataType) {
@@ -157,4 +136,19 @@ function versionify(tokens, newVersion) {
   })
 
   return null
+}
+
+function mapName(name) {
+  if (name === 'fragColor' || name === 'fragDepth' || reservedWords.indexOf(name) >= 0) {
+    name = 'unique_' + name;
+  }
+  return name;
+}
+
+function unmapName(name) {
+  const match = name.match(/^unique_(.+)$/);
+  if (match) {
+    name = match[1];
+  }
+  return name;
 }
