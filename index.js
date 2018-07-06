@@ -46,7 +46,7 @@ function transpile(isVertex, source, newVersion = '150') {
           token.data = fragDepthName
         }
       } else if (token.type === 'ident' && reservedWords.indexOf(token.data) >= 0) {
-        if (isVertex && isAttribtue(tokens, i)) {
+        if (isVertex && isAttribute(tokens, i)) {
           throw new Error(`Unable to transpile GLSL 100 to ${newVersion} automatically: ` +
               `One of the vertex shader attributes is using a reserved ${newVersion} keyword "${token.data}"`)
         }
@@ -71,7 +71,7 @@ function transpile(isVertex, source, newVersion = '150') {
   return stringify(tokens)
 }
 
-function isAttribtue (tokens, index) {
+function isAttribute (tokens, index) {
   for (var i = index - 1; i >= 0; i--) {
     var token = tokens[i]
     if (token.type === 'keyword') {
