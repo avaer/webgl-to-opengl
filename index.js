@@ -21,6 +21,19 @@ function transpile(isVertex, source, newVersion = '150') {
   var tokens = tokenize(source)
   var oldVersion = versionify(tokens, newVersion)
   if (oldVersion !== newVersion) {
+    for (i = tokens.length - 1; i >= 0; i--) {
+      token = tokens[i]
+      if (token.type === 'preprocessor') {
+        var match = token.data.match(/\#extension\s+(.*)\:/)
+        if (match && match[1] && coreGLSLExtensions.indexOf(match[1].trim()) >= 0) {
+          var nextToken = tokens[i + 1]
+          var count = (nextToken && nextToken.type === 'whitespace')
+            ? 2 : 1
+          tokens.splice(i, count)
+        }
+      }
+    }
+    
     var fragColorName = null
     var fragDepthName = null
     var i, token
@@ -51,19 +64,6 @@ function transpile(isVertex, source, newVersion = '150') {
               `One of the vertex shader attributes is using a reserved ${newVersion} keyword "${token.data}"`)
         }
         token.data = mapName(token.data)
-      }
-    }
-
-    for (i = tokens.length - 1; i >= 0; i--) {
-      token = tokens[i]
-      if (token.type === 'preprocessor') {
-        var match = token.data.match(/\#extension\s+(.*)\:/)
-        if (match && match[1] && coreGLSLExtensions.indexOf(match[1].trim()) >= 0) {
-          var nextToken = tokens[i + 1]
-          var count = (nextToken && nextToken.type === 'whitespace')
-            ? 2 : 1
-          tokens.splice(i, count)
-        }
       }
     }
   }
