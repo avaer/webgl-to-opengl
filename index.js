@@ -110,6 +110,9 @@ function versionify(tokens, newVersion) {
       var match = version.exec(token.data)
       if (match) {
         var number = match[1].replace(/\s\s+/g, ' ')
+        if (number === '300 es') {
+          number = '150';
+        }
         if (number === newVersion) {
           // this shader is already in new version
           return number
