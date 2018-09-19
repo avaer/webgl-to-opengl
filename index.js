@@ -1,4 +1,3 @@
-var version = require('glsl-version-regex')
 var inject = require('glsl-token-inject-block')
 var tokenize = require('glsl-tokenizer')
 var stringify = require('glsl-token-string')
@@ -7,6 +6,8 @@ module.exports.vertex = transpile.bind(null, true)
 module.exports.fragment = transpile.bind(null, false)
 module.exports.mapName = mapName
 module.exports.unmapName = unmapName
+
+var version = /^\s*\#version\s+([0-9]+(\s+[a-zA-Z]+)?)\s*/
 
 const coreGLSLExtensions = [
   'GL_OES_standard_derivatives',
