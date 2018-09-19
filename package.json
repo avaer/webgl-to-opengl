@@ -9,7 +9,6 @@
     "email": "a@modules.io"
   },
   "dependencies": {
-    "glsl-token-inject-block": "^1.1.0",
     "glsl-token-string": "^1.0.1",
     "glsl-tokenizer": "^2.1.2"
   },
