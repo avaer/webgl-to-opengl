@@ -187,7 +187,7 @@ function inject(tokens, newTokens) {
     tokens.splice(start++, 0, newline)
   }
   tokens.splice.apply(tokens, [ start, 0 ].concat(newTokens))
-  
+
   var end = start + newTokens.length
   if (tokens[end] && /[^\r\n]$/.test(tokens[end].data)) {
     tokens.splice(end, 0, newline)
@@ -201,7 +201,7 @@ function getStartIndex(tokens) {
   for (var i = 0; i < tokens.length; i++) {
     var token = tokens[i]
     if (token.type === 'preprocessor') {
-      if (/^#(extension|version|endif)/.test(token.data)) {
+      if (/^#(extension|version)/.test(token.data)) {
         start = Math.max(start, i)
       }
     } else if (token.type === 'keyword' && token.data === 'precision') {
@@ -212,7 +212,19 @@ function getStartIndex(tokens) {
       start = Math.max(start, semi)
     }
   }
-  return start + 1
+
+  start++
+  for (var i = start; i < tokens.length; i++) {
+    var token = tokens[i]
+    if (token.type === 'preprocessor' || token.type === 'whitespace') {
+      continue;
+    } else {
+      start = i
+      break
+    }
+  }
+
+  return start
 }
 
 function findNextSemicolon(tokens, start) {
