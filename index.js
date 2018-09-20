@@ -212,7 +212,19 @@ function getStartIndex(tokens) {
       start = Math.max(start, semi)
     }
   }
-  return start + 1
+
+  start++
+  for (var i = start; i < tokens.length; i++) {
+    var token = tokens[i]
+    if (token.type === 'preprocessor' || token.type === 'whitespace') {
+      continue;
+    } else {
+      start = i
+      break
+    }
+  }
+
+  return start
 }
 
 function findNextSemicolon(tokens, start) {
