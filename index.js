@@ -187,7 +187,7 @@ function inject(tokens, newTokens) {
     tokens.splice(start++, 0, newline)
   }
   tokens.splice.apply(tokens, [ start, 0 ].concat(newTokens))
-  
+
   var end = start + newTokens.length
   if (tokens[end] && /[^\r\n]$/.test(tokens[end].data)) {
     tokens.splice(end, 0, newline)
