@@ -1,6 +1,6 @@
 {
   "name": "webgl-to-opengl",
-  "version": "0.0.10",
+  "version": "0.0.11",
   "description": "Convert GLSL from WebGL to OpenGL",
   "main": "index.js",
   "license": "MIT",
