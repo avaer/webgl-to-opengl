@@ -40,7 +40,6 @@ function transpile(isVertex, source, newVersion = '150') {
     }
 
     var fragColorName = null
-    var fragDepthName = null
     var i, token
     for (i = 0; i < tokens.length; i++) {
       token = tokens[i]
@@ -56,12 +55,6 @@ function transpile(isVertex, source, newVersion = '150') {
             insertFragOutput(tokens, fragColorName, 'vec4')
           }
           token.data = fragColorName
-        } else if (token.data === 'gl_FragDepth') {
-          if (!fragDepthName) {
-            fragDepthName = mapName('fragDepth')
-            insertFragOutput(tokens, fragDepthName, 'float')
-          }
-          token.data = fragDepthName
         }
       } else if (token.type === 'ident' && reservedWords.indexOf(token.data) >= 0) {
         if (isVertex && isAttribute(tokens, i)) {
@@ -164,7 +157,7 @@ function versionify(tokens, newVersion) {
 }
 
 function mapName(name) {
-  if (name === 'fragColor' || name === 'fragDepth' || reservedWords.indexOf(name) >= 0) {
+  if (name === 'fragColor' || reservedWords.indexOf(name) >= 0) {
     name = 'unique_' + name;
   }
   return name;
