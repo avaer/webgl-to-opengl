@@ -188,6 +188,22 @@ function inject(tokens, newTokens) {
   return tokens
 }
 
+function findNextEndif(tokens, i) {
+  for (; i < tokens.length; i++) {
+    const token = tokens[i];
+    if (/^#ifn?def/.test(token.data)) {
+      const endif = findNextEndif(tokens, i + 1);
+      if (endif === -1) {
+        throw new Error('#if with no #endif');
+      }
+      i = endif;
+    } else if (token.type === 'preprocessor' && /^#endif/.test(token.data)) {
+      return i;
+    }
+  }
+  return -1;
+}
+
 function getStartIndex(tokens) {
   // determine starting index for attributes
   var start = -1
@@ -195,26 +211,29 @@ function getStartIndex(tokens) {
     var token = tokens[i]
     if (token.type === 'preprocessor') {
       if (/^#(extension|version)/.test(token.data)) {
-        start = Math.max(start, i)
+        start = i;
+      } else if (/^#ifn?def/.test(token.data)) {
+        const endif = findNextEndif(tokens, i + 1);
+        if (endif === -1) {
+          throw new Error('#if with no #endif');
+        }
+        start = i = endif;
       }
     } else if (token.type === 'keyword' && token.data === 'precision') {
-      var semi = findNextSemicolon(tokens, i)
+      var semi = findNextSemicolon(tokens, i);
       if (semi === -1) {
-        throw new Error('precision statement not followed by any semicolons!')
+        throw new Error('precision statement not followed by any semicolons!');
       }
-      start = Math.max(start, semi)
+      start = i = semi;
+    } else if (token.type === 'whitespace') {
+      continue;
+    } else {
+      break;
     }
   }
 
-  start++
-  for (var i = start; i < tokens.length; i++) {
-    var token = tokens[i]
-    if (token.type === 'preprocessor' || token.type === 'whitespace') {
-      continue;
-    } else {
-      start = i
-      break
-    }
+  if (start < tokens.length) {
+    start++;
   }
 
   return start
