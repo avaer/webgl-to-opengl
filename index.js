@@ -47,9 +47,9 @@ function transpile(isVertex, source, newVersion = '150') {
         if (token.data === 'attribute') token.data = 'in'
         else if (token.data === 'varying') token.data = isVertex ? 'out' : 'in'
       } else if ((token.type === 'preprocessor') && /^#define/.test(token.data)) {
-        token.data = token.data.replace(/texture(2D|Cube|EXT)/g, 'texture')
-      } else if ((token.type === 'builtin') && /^texture(2D|Cube|EXT)?/.test(token.data)) {
-        token.data = token.data.replace(/(2D|Cube|EXT)/g, '')
+        token.data = token.data.replace(/(texture)(?:2D|Cube)?(Lod)?(?:EXT)?/g, '$1$2');
+      } else if ((token.type === 'builtin') && /^(texture)(?:2D|Cube)?(Lod)?(?:EXT)?/.test(token.data)) {
+        token.data = token.data.replace(/(texture)(?:2D|Cube)?(Lod)?(?:EXT)?/g, '$1$2');
       } else if (token.type === 'builtin' && !isVertex) {
         if (token.data === 'gl_FragColor') {
           if (!fragColorName) {
