@@ -107,10 +107,16 @@ function addGlsl2Extensions(tokens, i) {
   tokens.splice.apply(tokens, [i, 0, {
     data: '\n',
     type: 'whitespace'
-  }].concat(coreGLSL2Extensions.map(ext => ({
-    data: `#extension ${ext} : enable`,
-    type: 'preprocessor'
-  }))).concat([{
+  }].concat(coreGLSL2Extensions.flatMap(ext => [
+    {
+      data: `#extension ${ext} : enable`,
+      type: 'preprocessor'
+    },
+    {
+      data: '\n',
+      type: 'whitespace'
+    },
+  ])).concat([{
     data: '\n',
     type: 'whitespace'
   }]))
