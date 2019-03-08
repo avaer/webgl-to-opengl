@@ -19,10 +19,11 @@ const coreGLSLExtensions = [
 const coreGLSL2Extensions = [
   'GL_ARB_separate_shader_objects',
 ];
+const defaultNewVersion = '330';
 
 var reservedWords = require('./lib/builtins')
 
-function transpile(isVertex, source, newVersion = '150') {
+function transpile(isVertex, source, newVersion = defaultNewVersion) {
   var tokens = tokenize(source)
   var oldVersion = versionify(tokens, newVersion)
   if (oldVersion !== newVersion) {
@@ -130,7 +131,7 @@ function versionify(tokens, newVersion) {
       if (match) {
         var number = match[1].replace(/\s\s+/g, ' ')
         if (number === '300 es') {
-          number = '150';
+          number = defaultNewVersion;
           tokens.splice(i, 1, {
             data: `#version ${number}`,
             type: 'preprocessor'
