@@ -131,7 +131,7 @@ function versionify(tokens, newVersion) {
       if (match) {
         var number = match[1].replace(/\s\s+/g, ' ')
         if (number === '300 es') {
-          number = defaultNewVersion;
+          number = newVersion;
           tokens.splice(i, 1, {
             data: `#version ${number}`,
             type: 'preprocessor'
