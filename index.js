@@ -12,7 +12,6 @@ var newline = { data: '\n', type: 'whitespace' }
 
 const coreGLSLExtensions = [
   'GL_OES_standard_derivatives',
-  'GL_EXT_frag_depth',
   'GL_EXT_draw_buffers',
   'GL_EXT_shader_texture_lod',
 ];
