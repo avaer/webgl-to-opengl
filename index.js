@@ -15,9 +15,9 @@ const coreGLSLExtensions = [
   'GL_EXT_draw_buffers',
   'GL_EXT_shader_texture_lod',
 ];
-const coreGLSL2Extensions = [
+/* const coreGLSL2Extensions = [
   'GL_ARB_separate_shader_objects',
-];
+]; */
 const defaultNewVersion = '330';
 
 var reservedWords = require('./lib/builtins')
@@ -103,7 +103,7 @@ function insertFragOutput (tokens, name, dataType) {
   ])
 }
 
-function addGlsl2Extensions(tokens, i) {
+/* function addGlsl2Extensions(tokens, i) {
   tokens.splice.apply(tokens, [i, 0, {
     data: '\n',
     type: 'whitespace'
@@ -120,7 +120,7 @@ function addGlsl2Extensions(tokens, i) {
     data: '\n',
     type: 'whitespace'
   }]))
-}
+} */
 
 function versionify(tokens, newVersion) {
   for (var i = 0; i < tokens.length; i++) {
@@ -137,15 +137,14 @@ function versionify(tokens, newVersion) {
           })
         }
         if (number === newVersion) {
-          addGlsl2Extensions(tokens, i + 1)
-          // this shader is already in new version
+          // addGlsl2Extensions(tokens, i + 1)
           return number
         } else if (number === '100') {
           tokens.splice(i, 1, {
             data: `#version ${newVersion}`,
             type: 'preprocessor'
           })
-          addGlsl2Extensions(tokens, i + 1);
+          // addGlsl2Extensions(tokens, i + 1);
           return number
         } else {
           throw new Error('unknown #version type: ' + number)
@@ -159,7 +158,7 @@ function versionify(tokens, newVersion) {
     data: `#version ${newVersion}`,
     type: 'preprocessor'
   })
-  addGlsl2Extensions(tokens, 1)
+  // addGlsl2Extensions(tokens, 1)
 
   return null
 }
