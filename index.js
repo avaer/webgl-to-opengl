@@ -157,6 +157,9 @@ function versionify(tokens, newVersion) {
   tokens.splice(0, 0, {
     data: `#version ${newVersion}`,
     type: 'preprocessor'
+  }, {
+    data: '\n',
+    type: 'whitespace'
   })
   // addGlsl2Extensions(tokens, 1)
 
